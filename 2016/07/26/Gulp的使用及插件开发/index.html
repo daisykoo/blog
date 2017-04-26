@@ -1,0 +1,752 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/blog/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/blog/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/blog/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Node.js," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/blog/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Grunt–I/O操作： 读取A →  A.a() → 写出A → 读取A → A.b() → 写出A; gulp–数据流：读取A → A.a() → A.b() → 写出A.  Part① 构建gulp安装12npm install --global gulp   //全局安装npm install --save-dev      //项目内安装 gulp官网 四个接口1234gulp.tas">
+<meta name="keywords" content="Node.js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gulp的使用及插件开发">
+<meta property="og:url" content="http://daisykoo.github.io/blog/2016/07/26/Gulp的使用及插件开发/index.html">
+<meta property="og:site_name" content="new Me">
+<meta property="og:description" content="Grunt–I/O操作： 读取A →  A.a() → 写出A → 读取A → A.b() → 写出A; gulp–数据流：读取A → A.a() → A.b() → 写出A.  Part① 构建gulp安装12npm install --global gulp   //全局安装npm install --save-dev      //项目内安装 gulp官网 四个接口1234gulp.tas">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/2773737-c6ddb74158bc868e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-04-26T01:41:04.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Gulp的使用及插件开发">
+<meta name="twitter:description" content="Grunt–I/O操作： 读取A →  A.a() → 写出A → 读取A → A.b() → 写出A; gulp–数据流：读取A → A.a() → A.b() → 写出A.  Part① 构建gulp安装12npm install --global gulp   //全局安装npm install --save-dev      //项目内安装 gulp官网 四个接口1234gulp.tas">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/2773737-c6ddb74158bc868e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/blog/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://daisykoo.github.io/blog/2016/07/26/Gulp的使用及插件开发/"/>
+
+
+
+
+
+  <title>Gulp的使用及插件开发 | new Me</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/blog/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">new Me</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">class Me = 'daisykoo';</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/blog/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/blog/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/blog/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://daisykoo.github.io/blog/blog/2016/07/26/Gulp的使用及插件开发/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Daisykoo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="new Me">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Gulp的使用及插件开发
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-07-26T09:40:17+08:00">
+                2016-07-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>Grunt–I/O操作： 读取A →  A.a() → 写出A → 读取A → A.b() → 写出A;</p>
+<p>gulp–数据流：读取A → A.a() → A.b() → 写出A.</p>
+</blockquote>
+<h1 id="Part①-构建gulp"><a href="#Part①-构建gulp" class="headerlink" title="Part① 构建gulp"></a>Part① 构建gulp</h1><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">npm install --global gulp   //全局安装</div><div class="line">npm install --save-dev      //项目内安装</div></pre></td></tr></table></figure>
+<p><a href="http://www.gulpjs.com.cn/" target="_blank" rel="external">gulp官网</a></p>
+<h2 id="四个接口"><a href="#四个接口" class="headerlink" title="四个接口"></a>四个接口</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">gulp.task();    <span class="comment">//自定义任务</span></div><div class="line">gulp.src();		<span class="comment">//引入文件</span></div><div class="line">gulp.dest();	<span class="comment">//导出文件</span></div><div class="line">gulp.watch();	<span class="comment">//监听文件变化，调用任务</span></div></pre></td></tr></table></figure>
+<h2 id="配置文件gulpfile-js"><a href="#配置文件gulpfile-js" class="headerlink" title="配置文件gulpfile.js"></a>配置文件gulpfile.js</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//引入插件</span></div><div class="line"><span class="keyword">var</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</div><div class="line"><span class="keyword">var</span> less = <span class="built_in">require</span>(<span class="string">'gulp-less'</span>);</div><div class="line"></div><div class="line">gulp.task(<span class="string">'build:css'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    gulp.src([<span class="string">'../css/less/*.less'</span>,    </div><div class="line">        <span class="string">'../css/less/**/*.less'</span>,</div><div class="line">        <span class="string">'!../css/less/test.less'</span>  <span class="comment">//排除文件</span></div><div class="line">        ])</div><div class="line">        .pipe(less().on(<span class="string">'error'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">e</span>)</span>&#123;</div><div class="line">            <span class="built_in">console</span>.error(e.message);</div><div class="line">            <span class="keyword">this</span>.emit(<span class="string">'end'</span>);</div><div class="line">        &#125;))</div><div class="line">        .pipe(gulp.dest(<span class="string">'../css'</span>))</div><div class="line">&#125;);</div><div class="line"></div><div class="line">gulp.watch([<span class="string">'../css/less/*.less'</span>,<span class="string">'../css/less/**/*.less'</span>], [<span class="string">'build:css'</span>]);</div><div class="line">gulp.task(<span class="string">'default'</span>, [<span class="string">'build:css'</span>, <span class="string">'watch'</span>]);</div></pre></td></tr></table></figure>
+<p><a href="https://github.com/isaacs/node-glob" target="_blank" rel="external">glob文件路径匹配详细文档</a></p>
+<h2 id="运行："><a href="#运行：" class="headerlink" title="运行："></a>运行：</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//运行default任务</span></div><div class="line">gulp </div><div class="line"><span class="comment">//单独运行某个任务</span></div><div class="line">gulp built:css</div></pre></td></tr></table></figure>
+<h1 id="Part②-常用插件"><a href="#Part②-常用插件" class="headerlink" title="Part② 常用插件"></a>Part② 常用插件</h1><h2 id="插件"><a href="#插件" class="headerlink" title="插件"></a>插件</h2><pre><code>npm install gulp-less --save-dev //插件安装，同步到拓展程序列表
+</code></pre><p><a href="https://www.npmjs.com/search?q=gulp" target="_blank" rel="external">插件库</a></p>
+<h4 id="package-json"><a href="#package-json" class="headerlink" title="package.json"></a>package.json</h4><pre><code>{
+  &quot;name&quot;: &quot;budiuhuanxin&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;description&quot;: &quot;&quot;,
+  &quot;main&quot;: &quot;gulpfile.js&quot;,
+  &quot;dependencies&quot;: {},
+  &quot;devDependencies&quot;: {
+    &quot;gulp-autoprefixer&quot;: &quot;^3.1.0&quot;,
+    &quot;gulp-concat&quot;: &quot;^2.6.0&quot;,
+    &quot;gulp-css-spriter&quot;: &quot;^0.3.3&quot;,
+    &quot;gulp-css-spritesmith&quot;: &quot;0.0.5&quot;,
+    &quot;gulp-header&quot;: &quot;^1.7.1&quot;,
+    &quot;gulp-jshint&quot;: &quot;^2.0.0&quot;,
+    &quot;gulp-less&quot;: &quot;^3.0.5&quot;,
+    &quot;gulp-minify-css&quot;: &quot;^1.2.4&quot;,
+    &quot;gulp-plumber&quot;: &quot;^1.1.0&quot;,
+    &quot;gulp-postcss&quot;: &quot;^6.1.0&quot;,
+    &quot;gulp-rename&quot;: &quot;^1.2.2&quot;,
+    &quot;gulp-uglify&quot;: &quot;^1.5.3&quot;,
+    &quot;jshint&quot;: &quot;^2.9.2&quot;,
+
+    &quot;jshint-stylish&quot;: &quot;^2.1.0&quot;
+  },
+  &quot;scripts&quot;: {
+    &quot;test&quot;: &quot;echo \&quot;Error: no test specified\&quot; &amp;&amp; exit 1&quot;
+  },
+  &quot;author&quot;: &quot;&quot;,
+  &quot;license&quot;: &quot;ISC&quot;
+}
+</code></pre><h4 id="常用插件"><a href="#常用插件" class="headerlink" title="常用插件"></a>常用插件</h4><p><img src="http://upload-images.jianshu.io/upload_images/2773737-c6ddb74158bc868e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="常用gulp插件.png"></p>
+<h5 id="gulp-plumber-监测工作流，报错，防止遇到错误时直接退出gulp。"><a href="#gulp-plumber-监测工作流，报错，防止遇到错误时直接退出gulp。" class="headerlink" title="gulp-plumber : 监测工作流，报错，防止遇到错误时直接退出gulp。"></a>gulp-plumber : 监测工作流，报错，防止遇到错误时直接退出gulp。</h5><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</div><div class="line"><span class="keyword">var</span> less = <span class="built_in">require</span>(<span class="string">'gulp-less'</span>);</div><div class="line"><span class="keyword">var</span> plumber = <span class="built_in">require</span>(<span class="string">'gulp-plumber'</span>);</div><div class="line"></div><div class="line">gulp.task(<span class="string">'build:css'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    gulp.src([<span class="string">'../css/less/*.less'</span>,    </div><div class="line">        <span class="string">'../css/less/**/*.less'</span>,</div><div class="line">        <span class="string">'!../css/less/test.less'</span>  <span class="comment">//排除文件</span></div><div class="line">        ])</div><div class="line">    	.pipe(plumber())</div><div class="line">        .pipe(less().on(<span class="string">'error'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">e</span>)</span>&#123;</div><div class="line">            <span class="built_in">console</span>.error(e.message);</div><div class="line">            <span class="keyword">this</span>.emit(<span class="string">'end'</span>);</div><div class="line">        &#125;))</div><div class="line">        .pipe(gulp.dest(<span class="string">'../css'</span>))</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h5 id="gulp-rev-文件名添加版本号，html更新引用"><a href="#gulp-rev-文件名添加版本号，html更新引用" class="headerlink" title="gulp-rev : 文件名添加版本号，html更新引用"></a>gulp-rev : 文件名添加版本号，html更新引用</h5><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> rev = <span class="built_in">require</span>(<span class="string">'gulp-rev'</span>); <span class="comment">//添加文件版本号</span></div><div class="line"><span class="keyword">var</span> revCollector = <span class="built_in">require</span>(<span class="string">"gulp-rev-collector"</span>);<span class="comment">//修改html文件引用</span></div><div class="line"></div><div class="line">gulp.task(<span class="string">'build:js'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    gulp.src([<span class="string">'src/js/*.js'</span>])</div><div class="line">        .pipe(plumber())</div><div class="line">        .pipe(uglify())   <span class="comment">//压缩</span></div><div class="line">        .pipe(addMin(<span class="string">'dest/js/record.json'</span>, <span class="string">'.min'</span>))</div><div class="line">        .pipe(rev())  <span class="comment">//set hash key</span></div><div class="line">        .pipe(gulp.dest(<span class="string">'dest/js/'</span>)) <span class="comment">//文件导出</span></div><div class="line">        .pipe(rev.manifest()) <span class="comment">//set hash key json</span></div><div class="line">        .pipe(gulp.dest(<span class="string">'dest/js'</span>)); <span class="comment">//dest hash key json</span></div><div class="line">&#125;);</div><div class="line"></div><div class="line">gulp.task(<span class="string">'rev'</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> gulp.src([<span class="string">'dest/js/rev-manifest.json'</span>,<span class="string">'src/html/*.html'</span>])</div><div class="line">        .pipe(revCollector(&#123;</div><div class="line">            <span class="attr">replaceReved</span>: <span class="literal">true</span>,</div><div class="line">        &#125;))</div><div class="line">        .pipe(gulp.dest(<span class="string">'dest/html'</span>));</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h5 id="gulp-autoprefixer：css自动前缀"><a href="#gulp-autoprefixer：css自动前缀" class="headerlink" title="gulp-autoprefixer：css自动前缀"></a>gulp-autoprefixer：css自动前缀</h5><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> gulp = <span class="built_in">require</span>(<span class="string">'gulp'</span>);</div><div class="line"><span class="keyword">var</span> autoprefixer = <span class="built_in">require</span>(<span class="string">'gulp-autoprefixer'</span>);</div><div class="line"> </div><div class="line">gulp.task(<span class="string">'default'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; </div><div class="line">    gulp.src(<span class="string">'src/app.css'</span>)</div><div class="line">        .pipe(autoprefixer(&#123;</div><div class="line">            <span class="attr">browsers</span>: [<span class="string">'last 2 versions'</span>], <span class="comment">//浏览器版本</span></div><div class="line">            cascade: <span class="literal">false</span>   <span class="comment">//未压缩时是否不换行</span></div><div class="line">        &#125;))</div><div class="line">        .pipe(gulp.dest(<span class="string">'dest/style'</span>))</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h5 id="gulp-css-spritesmith：根据css文件自动生成雪碧图"><a href="#gulp-css-spritesmith：根据css文件自动生成雪碧图" class="headerlink" title="gulp-css-spritesmith：根据css文件自动生成雪碧图"></a>gulp-css-spritesmith：根据css文件自动生成雪碧图</h5><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> cssSprite = <span class="built_in">require</span>(<span class="string">'gulp-css-spritesmith'</span>); <span class="comment">//雪碧图</span></div><div class="line"></div><div class="line"><span class="comment">//雪碧图生成</span></div><div class="line">gulp.task(<span class="string">'autoSprite'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> file_data = [</div><div class="line">        <span class="comment">//每个数组表示需要编译的文件和对应切片图所在位置 </span></div><div class="line">        [<span class="string">'../css/indexBody.css'</span>, <span class="string">'index-body'</span>],</div><div class="line">        [[<span class="string">'../css/budiuNavbar.css'</span>,<span class="string">'../css/budiuBottom.css'</span>], <span class="string">'index-layout'</span>],</div><div class="line">        [<span class="string">'../css/goods.css'</span>, <span class="string">'goods'</span>],</div><div class="line">        [<span class="string">'../css/widget_chat.css'</span>, <span class="string">'widget_chat'</span>]</div><div class="line">    ];</div><div class="line"></div><div class="line">    file_data.forEach(<span class="function"><span class="keyword">function</span>(<span class="params">item, index, array</span>) </span>&#123;</div><div class="line">        gulp.src(item[<span class="number">0</span>])</div><div class="line">        .pipe(plumber())</div><div class="line">        .pipe(cssSprite(&#123;</div><div class="line">            <span class="comment">// sprite背景图源文件夹，只有匹配此路径才会处理，默认 images/slice/</span></div><div class="line">            imagepath: (<span class="string">'../images/'</span> + item[<span class="number">1</span>]),</div><div class="line">            <span class="comment">// 雪碧图输出目录，注意，会覆盖之前文件！默认 images/</span></div><div class="line">            spritedest: <span class="string">'../images/sprite'</span>,</div><div class="line">            <span class="comment">// 替换后的背景路径，默认 ../images/</span></div><div class="line">            spritepath: <span class="string">'../images/sprite'</span>,</div><div class="line">            <span class="attr">padding</span>: <span class="number">5</span></div><div class="line">        &#125;))</div><div class="line">        .pipe(gulp.dest(<span class="string">'../css'</span>));</div><div class="line">    &#125;)</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h5 id="gulp-jshint：js语法检查工具"><a href="#gulp-jshint：js语法检查工具" class="headerlink" title="gulp-jshint：js语法检查工具"></a>gulp-jshint：js语法检查工具</h5><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> jshint = <span class="built_in">require</span>(<span class="string">'gulp-jshint'</span>);    <span class="comment">//js语法检查工具</span></div><div class="line"><span class="keyword">var</span> stylish = <span class="built_in">require</span>(<span class="string">'jshint-stylish'</span>); <span class="comment">//后台提醒样式</span></div><div class="line"></div><div class="line">gulp.task(<span class="string">'build:js'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    gulp.src([<span class="string">'../js/src/*.js'</span>])</div><div class="line">        .pipe(plumber())</div><div class="line">        .pipe(jshint())   <span class="comment">//语法检查</span></div><div class="line">        .pipe(jshint.reporter(stylish))</div><div class="line">        .pipe(uglify())   <span class="comment">//压缩</span></div><div class="line">        .pipe(rename(&#123; <span class="attr">suffix</span>: <span class="string">'.min'</span> &#125;))</div><div class="line">        .pipe(gulp.dest(<span class="string">'../js'</span>))</div><div class="line">        .pipe(reload(&#123;<span class="attr">stream</span>: <span class="literal">true</span>&#125;));  <span class="comment">//自动刷新</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h1 id="Part③-插件开发"><a href="#Part③-插件开发" class="headerlink" title="Part③  插件开发"></a>Part③  插件开发</h1><p><a href="http://www.gulpjs.com.cn/docs/writing-a-plugin/" target="_blank" rel="external">官方教程</a></p>
+<h3 id="基本原则："><a href="#基本原则：" class="headerlink" title="基本原则："></a>基本原则：</h3><ol>
+<li>你的插件不应该去做一些现有 node 模块已经能很容易做到的事情(删除文件～)</li>
+<li>你的插件应该只做一件事，并且做好。（比如：一个 JS 压缩插件不应该有一个加头部的选项）</li>
+<li>你的插件不能去做一些其他插件做的事：（不应该去拼接，用 gulp-concat 去做，不应该去增加尾部，用 gulp-footer 去做）</li>
+<li>file.contents 的类型需要总是在输入输出中保持一致</li>
+</ol>
+<h3 id="插件开发两种处理方式"><a href="#插件开发两种处理方式" class="headerlink" title="插件开发两种处理方式"></a>插件开发两种处理方式</h3><blockquote>
+<p>buffer：专门存放二进制数据的缓冲区；</p>
+<p>stream： 文件流式数据（实际上属于buffer的一个特殊封装），适合用于处理大文件。</p>
+</blockquote>
+<h3 id="through2"><a href="#through2" class="headerlink" title="through2"></a>through2</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> through = <span class="built_in">require</span>(<span class="string">'through2'</span>);</div><div class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span> (<span class="params">options</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> through.obj(<span class="function"><span class="keyword">function</span> (<span class="params">file, enc, cb</span>) </span>&#123;</div><div class="line">        <span class="comment">// 主体实现忽略若干行</span></div><div class="line">    &#125;);</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<h3 id="File封装"><a href="#File封装" class="headerlink" title="File封装"></a>File封装</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> File = <span class="built_in">require</span>(<span class="string">'vinyl'</span>);</div><div class="line"></div><div class="line"><span class="keyword">var</span> coffeeFile = <span class="keyword">new</span> File(&#123;</div><div class="line">  <span class="attr">cwd</span>: <span class="string">"/"</span>,</div><div class="line">  <span class="attr">base</span>: <span class="string">"/test/"</span>,</div><div class="line">  <span class="attr">path</span>: <span class="string">"/test/file.coffee"</span>,</div><div class="line">  <span class="attr">relative</span>: <span class="string">"file.coffee"</span>,</div><div class="line">  <span class="attr">contents</span>: <span class="keyword">new</span> Buffer(<span class="string">"test = 123"</span>)</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h3 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h3><p>实现功能：为js文件名添加指定后缀，记录与源文件名的对应关系，并在html中更新引用文件名。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> gutil = <span class="built_in">require</span>(<span class="string">'gulp-util'</span>);</div><div class="line"><span class="keyword">var</span> through = <span class="built_in">require</span>(<span class="string">'through2'</span>);</div><div class="line"><span class="keyword">var</span> PluginError = gutil.PluginError;</div><div class="line"><span class="keyword">var</span> fs = <span class="built_in">require</span>(<span class="string">'fs'</span>);</div><div class="line"><span class="keyword">var</span> _ = <span class="built_in">require</span>(<span class="string">'underscore'</span>);</div><div class="line"></div><div class="line"><span class="keyword">var</span> PLUGIN_NAME = <span class="string">'gulp-addSuffix'</span>;</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">refreshRecord</span>(<span class="params">recordPath, data</span>) </span>&#123;</div><div class="line">	fs.open(recordPath, <span class="string">'a+'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">err, fd</span>)</span>&#123;</div><div class="line">		<span class="keyword">if</span>(err) <span class="keyword">throw</span> err;</div><div class="line">		</div><div class="line">		<span class="keyword">var</span> oldDataObj = <span class="literal">null</span>;</div><div class="line">		<span class="keyword">var</span> oldData = fs.readFileSync(recordPath, <span class="string">'utf-8'</span>);</div><div class="line"></div><div class="line">		<span class="keyword">if</span> (oldData.length === <span class="number">0</span>) &#123;</div><div class="line">			oldDataObj = &#123;&#125;;</div><div class="line">		&#125; <span class="keyword">else</span> &#123;</div><div class="line">			oldDataObj = <span class="built_in">JSON</span>.parse(oldData);</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">var</span> files = _.keys(data);</div><div class="line">		files.forEach(<span class="function"><span class="keyword">function</span>(<span class="params">key, n, arr</span>) </span>&#123;</div><div class="line">			oldDataObj[key] = data[key];</div><div class="line">		&#125;);</div><div class="line">		<span class="keyword">var</span> buffer = <span class="keyword">new</span> Buffer(<span class="built_in">JSON</span>.stringify(oldDataObj));</div><div class="line">		fs.write(fd, buffer, <span class="number">0</span>, buffer.length, <span class="number">0</span>, <span class="function"><span class="keyword">function</span>(<span class="params">err, written, buffer</span>)</span>&#123;</div><div class="line">			<span class="keyword">if</span> (err) &#123;<span class="keyword">throw</span> err&#125; </div><div class="line">		&#125;);</div><div class="line">	&#125;);</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="comment">//js 文件添加后缀并输出记录</span></div><div class="line"><span class="keyword">var</span> plugin = <span class="function"><span class="keyword">function</span>(<span class="params">recordPath, insertString</span>) </span>&#123;</div><div class="line">	<span class="keyword">if</span> (!recordPath) &#123;</div><div class="line">		<span class="keyword">this</span>.emit(<span class="string">'error'</span>, <span class="keyword">new</span> PluginError(PLUGIN_NAME, <span class="string">' missing path of record file'</span>));</div><div class="line">	&#125; <span class="keyword">else</span> <span class="keyword">if</span> (!insertString) &#123;</div><div class="line">		<span class="keyword">this</span>.emit(<span class="string">'error'</span>, <span class="keyword">new</span> PluginError(PLUGIN_NAME, <span class="string">' missing insert content'</span>));</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">return</span> through.obj(<span class="function"><span class="keyword">function</span> (<span class="params">file, enc, cb</span>) </span>&#123;</div><div class="line">		<span class="keyword">if</span> (file.isNull()) &#123;</div><div class="line">			<span class="keyword">this</span>.push(file);</div><div class="line">			<span class="keyword">return</span> cb();</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="keyword">if</span> (file.isStream()) &#123;</div><div class="line">			<span class="keyword">this</span>.emit(<span class="string">'error'</span>, <span class="keyword">new</span> PluginError(PLUGIN_NAME, <span class="string">'Streaming not supported'</span>));</div><div class="line">			<span class="keyword">return</span> cb();</div><div class="line">		&#125;</div><div class="line">      </div><div class="line">		<span class="keyword">var</span> oldName = file.relative;</div><div class="line">		<span class="keyword">var</span> arr = oldName.split(<span class="string">'.'</span>);</div><div class="line">		<span class="keyword">var</span> newName = arr[<span class="number">0</span>] + insertString + <span class="string">'.'</span> + arr[<span class="number">1</span>];</div><div class="line">		file.path = file.base + newName;</div><div class="line">		</div><div class="line">      	<span class="keyword">var</span> record = &#123;&#125;;</div><div class="line">		record[oldName] = newName;</div><div class="line">		refreshRecord(recordPath, record);</div><div class="line">		</div><div class="line">		<span class="keyword">this</span>.push(file);</div><div class="line">		cb();</div><div class="line">	&#125;);</div><div class="line">&#125;</div><div class="line"><span class="comment">//修改html引用路径</span></div><div class="line">plugin.html = <span class="function"><span class="keyword">function</span>(<span class="params">recordPath</span>) </span>&#123;</div><div class="line">	<span class="keyword">return</span> through.obj(<span class="function"><span class="keyword">function</span>(<span class="params">file, enc, cb</span>) </span>&#123;</div><div class="line">		<span class="keyword">if</span> (file.isNull()) &#123;</div><div class="line">			<span class="keyword">this</span>.push(file);</div><div class="line">			<span class="keyword">return</span> cb();</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">if</span> (file.isStream()) &#123;</div><div class="line">			<span class="keyword">this</span>.emit(<span class="string">'error'</span>, <span class="keyword">new</span> PluginError(PLUGIN_NAME, <span class="string">'Streaming not supported'</span>));</div><div class="line">			<span class="keyword">return</span> cb();</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">var</span> fileData = file.contents.toString(<span class="string">'utf-8'</span>);</div><div class="line">		<span class="keyword">var</span> recordData = fs.readFileSync(recordPath,<span class="string">'utf-8'</span>);</div><div class="line"></div><div class="line">		<span class="keyword">if</span> (recordData.length === <span class="number">0</span>) &#123;</div><div class="line">			<span class="keyword">this</span>.push(file);</div><div class="line">			cb();</div><div class="line">		&#125; <span class="keyword">else</span> &#123;</div><div class="line">			<span class="keyword">var</span> recordObj = <span class="built_in">JSON</span>.parse(recordData);</div><div class="line">			<span class="keyword">var</span> keys = _.keys(recordObj);</div><div class="line">			keys.forEach(<span class="function"><span class="keyword">function</span>(<span class="params">item, n, arr</span>) </span>&#123;</div><div class="line">				<span class="keyword">var</span> reg = <span class="keyword">new</span> <span class="built_in">RegExp</span>(item, <span class="string">'g'</span>);</div><div class="line">				fileData = fileData.replace(reg, recordObj[item]);</div><div class="line">			&#125;);</div><div class="line">			file.contents = <span class="keyword">new</span> Buffer(fileData);</div><div class="line">			<span class="keyword">this</span>.push(file);</div><div class="line">			cb();</div><div class="line">		&#125;</div><div class="line">	&#125;);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = plugin;</div></pre></td></tr></table></figure>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/blog/tags/Node-js/" rel="tag"># Node.js</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2016/10/12/Html-table-实现Excel多格粘贴/" rel="next" title="Html table 实现Excel多格粘贴">
+                <i class="fa fa-chevron-left"></i> Html table 实现Excel多格粘贴
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2016/06/08/函数还能这样玩儿～用闭包实现类似add(1)(2)(3)的函数/" rel="prev" title="">
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/blog/images/avatar.gif"
+               alt="Daisykoo" />
+          <p class="site-author-name" itemprop="name">Daisykoo</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/blog/archives">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">Artikel</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">Tags</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Part①-构建gulp"><span class="nav-number">1.</span> <span class="nav-text">Part① 构建gulp</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">1.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四个接口"><span class="nav-number">1.2.</span> <span class="nav-text">四个接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件gulpfile-js"><span class="nav-number">1.3.</span> <span class="nav-text">配置文件gulpfile.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行："><span class="nav-number">1.4.</span> <span class="nav-text">运行：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Part②-常用插件"><span class="nav-number">2.</span> <span class="nav-text">Part② 常用插件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#插件"><span class="nav-number">2.1.</span> <span class="nav-text">插件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#package-json"><span class="nav-number">2.1.0.1.</span> <span class="nav-text">package.json</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#常用插件"><span class="nav-number">2.1.0.2.</span> <span class="nav-text">常用插件</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#gulp-plumber-监测工作流，报错，防止遇到错误时直接退出gulp。"><span class="nav-number">2.1.0.2.1.</span> <span class="nav-text">gulp-plumber : 监测工作流，报错，防止遇到错误时直接退出gulp。</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gulp-rev-文件名添加版本号，html更新引用"><span class="nav-number">2.1.0.2.2.</span> <span class="nav-text">gulp-rev : 文件名添加版本号，html更新引用</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gulp-autoprefixer：css自动前缀"><span class="nav-number">2.1.0.2.3.</span> <span class="nav-text">gulp-autoprefixer：css自动前缀</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gulp-css-spritesmith：根据css文件自动生成雪碧图"><span class="nav-number">2.1.0.2.4.</span> <span class="nav-text">gulp-css-spritesmith：根据css文件自动生成雪碧图</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gulp-jshint：js语法检查工具"><span class="nav-number">2.1.0.2.5.</span> <span class="nav-text">gulp-jshint：js语法检查工具</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Part③-插件开发"><span class="nav-number">3.</span> <span class="nav-text">Part③  插件开发</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本原则："><span class="nav-number">3.0.1.</span> <span class="nav-text">基本原则：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插件开发两种处理方式"><span class="nav-number">3.0.2.</span> <span class="nav-text">插件开发两种处理方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#through2"><span class="nav-number">3.0.3.</span> <span class="nav-text">through2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#File封装"><span class="nav-number">3.0.4.</span> <span class="nav-text">File封装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#案例"><span class="nav-number">3.0.5.</span> <span class="nav-text">案例</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Daisykoo</span>
+</div>
+
+
+<div class="powered-by">
+  Erstellt mit  <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/blog/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/blog/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/affix.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/blog/js/src/schemes/pisces.js?v=5.1.1"></script>
+
+
+
+  
+  <script type="text/javascript" src="/blog/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/blog/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
