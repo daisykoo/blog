@@ -1,0 +1,768 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/blog/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/blog/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/blog/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="JavaScript," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/blog/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="学习ES6和Webpack过程中，研究了一下CommonJS，AMD， CMD， ES6这些模块系统到底有什么区别。 #先提结论：  相同点是，所有的文件模块系统，都采用单例模式。 模块加载方面：CJS采用同步阻塞机制，而AMD采用异步回调机制，CMD可通过调用不同的require方法，采用不同的机制。 模块执行方面：CJS，AMD都采用预先执行，在引用模块的同时执行模块代码；CMD则采用延迟执行">
+<meta name="keywords" content="JavaScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="谈谈JS的那些文件模块系统">
+<meta property="og:url" content="http://daisykoo.github.io/blog/2017/03/21/谈谈JS的那些文件模块系统/index.html">
+<meta property="og:site_name" content="new Me">
+<meta property="og:description" content="学习ES6和Webpack过程中，研究了一下CommonJS，AMD， CMD， ES6这些模块系统到底有什么区别。 #先提结论：  相同点是，所有的文件模块系统，都采用单例模式。 模块加载方面：CJS采用同步阻塞机制，而AMD采用异步回调机制，CMD可通过调用不同的require方法，采用不同的机制。 模块执行方面：CJS，AMD都采用预先执行，在引用模块的同时执行模块代码；CMD则采用延迟执行">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/2773737-a0886e8887b21e13.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-04-26T00:57:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="谈谈JS的那些文件模块系统">
+<meta name="twitter:description" content="学习ES6和Webpack过程中，研究了一下CommonJS，AMD， CMD， ES6这些模块系统到底有什么区别。 #先提结论：  相同点是，所有的文件模块系统，都采用单例模式。 模块加载方面：CJS采用同步阻塞机制，而AMD采用异步回调机制，CMD可通过调用不同的require方法，采用不同的机制。 模块执行方面：CJS，AMD都采用预先执行，在引用模块的同时执行模块代码；CMD则采用延迟执行">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/2773737-a0886e8887b21e13.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/blog/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://daisykoo.github.io/blog/2017/03/21/谈谈JS的那些文件模块系统/"/>
+
+
+
+
+
+  <title>谈谈JS的那些文件模块系统 | new Me</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/blog/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">new Me</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">class Me = 'daisykoo';</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/blog/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Startseite
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/blog/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archiv
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/blog/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://daisykoo.github.io/blog/blog/2017/03/21/谈谈JS的那些文件模块系统/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Daisykoo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="new Me">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                谈谈JS的那些文件模块系统
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-21T08:56:04+08:00">
+                2017-03-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>学习ES6和Webpack过程中，研究了一下CommonJS，AMD， CMD， ES6这些模块系统到底有什么区别。</p>
+<p>#先提结论：</p>
+<ul>
+<li>相同点是，所有的文件模块系统，都采用单例模式。</li>
+<li>模块加载方面：CJS采用同步阻塞机制，而AMD采用异步回调机制，CMD可通过调用不同的<code>require</code>方法，采用不同的机制。</li>
+<li>模块执行方面：CJS，AMD都采用预先执行，在引用模块的同时执行模块代码；CMD则采用延迟执行，只有当模块中的变量或方法真正被执行时， 模块代码才被执行。</li>
+<li>个人觉得服务器端使用CJS和CMD都可以，但比较偏爱CJS简洁的语法。浏览器端从性能方面考虑还是比较推荐使用AMD，尽量避免在代码运行过程中去做资源请求。</li>
+<li>特别推荐使用<a href="http://webpack.github.io/" target="_blank" rel="external">webpack模块打包工具</a>配上ES6的模块文件系统语法，在本地进行模块编译后上线。</li>
+</ul>
+<p>#正文：<br>JS本来是没有模块的语言，随着页面交互越来越复杂，为了避免全局变量泛滥以及方便多人合作开发等，我们开始运用对象，模拟类，闭包等来实现模块的效果，例如：</p>
+<ul>
+<li><p>用对象将方法和变量封装起来。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">var module1 = &#123;</div><div class="line">　　_count : 0,</div><div class="line">　　m1 : function ()&#123;</div><div class="line">　　　　//...</div><div class="line">　　&#125;,</div><div class="line">　　m2 : function ()&#123;</div><div class="line">　　　　//...</div><div class="line">　　&#125;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+</li>
+<li><p>用闭包封装方法，可得到外部无法读取的私有变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">var module1 = (function()&#123;</div><div class="line">　　var _count = 0;</div><div class="line">　　var m1 = function()&#123;</div><div class="line">　　　　//...</div><div class="line">　　&#125;;</div><div class="line">　　var m2 = function()&#123;</div><div class="line">　　　　//...</div><div class="line">　　&#125;;</div><div class="line">　　return &#123;</div><div class="line">　　　　m1 : m1,</div><div class="line">　　　　m2 : m2</div><div class="line">　　&#125;;</div><div class="line">&#125;)();</div></pre></td></tr></table></figure>
+</li>
+<li><p>沙箱模式，声明模块依赖</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">Sandbox.modules = &#123;&#125;;</div><div class="line">Sandbox.modules.dom = function(box) &#123;</div><div class="line">	box.getElement = function() &#123;&#125;;</div><div class="line">	box.getStyle = function() &#123;console.log(&apos;getStyle&apos;)&#125;;</div><div class="line">	box.foo = &apos;bar&apos;;</div><div class="line">&#125;;</div><div class="line">new Sandbox([&apos;dom&apos;, &apos;ajax&apos;], function(box) &#123;     //声明依赖</div><div class="line">	box.getElement();</div><div class="line">&#125;)</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<blockquote>
+<p>思路：1. 将全局属性方法的初始化函数放在Sandbox构造函数的属性modules中；2. 在构造函数内部获取所需的属性，赋值给this； 3. 运行callback(this)。具体实现代码可在<a href="http://www.jianshu.com/p/47152e5afe73" target="_blank" rel="external">这篇文章里搜‘沙箱模式’查看</a>。</p>
+</blockquote>
+<p>虽然模块化编程能较好的帮助我们处理单个文件内的代码结构。但随着单页面应用的出现，单个js文件已经无法满足复杂交互的要求了。<br>而单纯依赖html<code>&lt;script&gt;</code>引用的多文件间没有依赖关系，需要根据依赖严格注意在页面中的引用顺序，即使这样，还是很容易出现错误。因此，协调不同文件之间依赖关系<strong>模块文件系统</strong>就出现了。</p>
+<p>##<a href="http://javascript.ruanyifeng.com/nodejs/module.html#toc0" target="_blank" rel="external">CommonJS</a><br>CommonJS 是以在浏览器环境之外构建 JavaScript 生态系统为目标而产生的项目，比如在服务器和桌面环境中。Node.js 就是CommonJS规范的最常见的实现。规范其中也定义了适合服务器端使用的<strong>同步阻塞</strong>文件模块系统：</p>
+<p>####语法：<br>module.exports属性表示当前模块对外输出的接口，其他文件加载该模块，实际上就是读取module.exports变量。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//a.js 定义模块</span></div><div class="line"><span class="built_in">module</span>.exports = <span class="string">'I am from a.js!'</span>;</div><div class="line"><span class="comment">//main.js 引用模块</span></div><div class="line"><span class="keyword">const</span> a = <span class="built_in">require</span>(<span class="string">'./a.js'</span>);</div><div class="line"><span class="built_in">console</span>.log(a);  <span class="comment">//输出'I am from a.js!'</span></div></pre></td></tr></table></figure></p>
+<p>为了方便，Node为每个模块提供一个exports变量，指向module.exports。这等同在每个模块头部，有一行这样的命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">var exports = module.exports;</div></pre></td></tr></table></figure></p>
+<p>这让我们可以很方便的在对外输出模块接口时，向exports对象添加方法。最终输出的是exports对象。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">//a.js 定义模块</div><div class="line">exports.doStuff = function() &#123;</div><div class="line">  console.log(&apos;doing stuff...&apos;);</div><div class="line">&#125;</div><div class="line">//main.js 引用模块</div><div class="line">const a = require(&apos;./a.js&apos;);</div><div class="line">a.doStuff();  //输出&apos;doing stuff...&apos;</div></pre></td></tr></table></figure></p>
+<blockquote>
+<p>这就解释了如果希望输出的是非对象类型，不能直接赋值给<code>exports</code>，而是要赋值给<code>module.export</code>。这是因为<code>exports</code>实际上是指向<code>module.export</code>的，修改它的值只会修改它的指针指向别的对象或数据，而不能修改<code>module.export</code>的值。</p>
+</blockquote>
+<p>####特征：</p>
+<ul>
+<li>同步阻塞：CommonJS规范加载模块是同步的，也就是说，只有加载完成，才能执行后面的操作。这是由于服务器端的文件是存在于本地的，加载时间比较短。但在浏览器端需要较长时间向服务器端请求文件的情况下，这种文件模块系统并不合适。</li>
+<li>单例模式： 虽然CommonJS允许在同一个文件对同一个模块多次引用，但获取到的是同一个对象(类，函数）。可以看看下面这个例子：<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">//counter.js 定义一个计数器函数，有一个内部变量i</div><div class="line">var i = 0</div><div class="line">function count() &#123;</div><div class="line">	return ++i;</div><div class="line">&#125;</div><div class="line">module.exports = count；</div><div class="line">//main.js引用counter.js</div><div class="line">var counter1 = require(&apos;./counter&apos;)</div><div class="line">var counter2 = require(&apos;./counter&apos;)</div><div class="line">var counter3 = require(&apos;./counter&apos;)</div><div class="line">console.log(counter1())</div><div class="line">console.log(counter2())</div><div class="line">console.log(counter3())</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>运行结果：三次引用counter.js都执行一次，分别输出1，2，3；说明三次引用的是同一个函数，操作的是同一个变量。<br><img src="http://upload-images.jianshu.io/upload_images/2773737-a0886e8887b21e13.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="WX20170321-163625.png"></p>
+<p>##<a href="https://github.com/amdjs/amdjs-api/wiki/AMD" target="_blank" rel="external">AMD</a><br>AMD是”Asynchronous Module Definition”的缩写，意思就是”异步模块定义”。相对于CommonJS的同步阻塞模块系统，更适合用于浏览器端。最常用的实现是require.js。</p>
+<p>它采用异步方式加载模块，模块的加载不影响它后面语句的运行。所有依赖这个模块的语句，都定义在一个回调函数中，等到加载完成之后，这个回调函数才会运行。</p>
+<p>####语法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">//name.js 定义模块</div><div class="line">define([], function()&#123;</div><div class="line">  return &apos;daisy&apos;;</div><div class="line">&#125;);</div><div class="line">//age.js 定义模块</div><div class="line">define([], function()&#123;</div><div class="line">  return 23;</div><div class="line">&#125;);</div><div class="line">//main.js 引用模块</div><div class="line">require([&apos;./name&apos;, &apos;./age&apos;], function(name, age) &#123;</div><div class="line">	console.log(`Hi! I am $&#123;name&#125;, I am $&#123;age&#125; years old.`);  //Hi! I am daisy, I am 23 years old.</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>AMD也采用require()语句加载模块，但是不同于CommonJS，它要求两个参数：</p>
+<ul>
+<li>第一个参数[module]，是一个数组，里面的成员就是要加载的模块；</li>
+<li>第二个参数callback，则是加载成功之后的回调函数。回调函数的参数依次是按照数组顺序依赖的模块内容。</li>
+</ul>
+<p>同样的，在define()语句定义模块时，第一个参数数组也可以用于引用其他模块，在回调函数的参数重输出。</p>
+<p>####特征：</p>
+<ul>
+<li>异步加载： 模块代码采用回调函数的形式执行，页面不需要停下等待加载完成，因此是浏览器端常用的模块文件系统。</li>
+<li>与CommonJS一样，引用时采用单例模式。<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">//counter.js </div><div class="line">define([], function()&#123;</div><div class="line">  let i = 0;</div><div class="line">  return function() &#123;</div><div class="line">  	return ++i;</div><div class="line">  &#125;</div><div class="line">&#125;);</div><div class="line">//main.js </div><div class="line">require([&apos;./counter&apos;], function(counter) &#123;</div><div class="line">	console.log(counter());   //1</div><div class="line">	console.log(counter());   //2</div><div class="line">	console.log(counter());   //3</div><div class="line">&#125;);</div><div class="line">require([&apos;./counter&apos;], function(counter) &#123;</div><div class="line">	console.log(counter());   //4</div><div class="line">	console.log(counter());   //5</div><div class="line">	console.log(counter());   //6</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>##<a href="https://github.com/seajs/seajs/issues/242" target="_blank" rel="external">CMD</a><br>CMD是个人比较不熟悉的，但感觉上更像是AMD和CJS的结合延伸。CMD 推崇 as lazy as possible，sea.js是CMD常用的实现。</p>
+<p>####语法：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">define(&#123; &quot;foo&quot;: &quot;bar&quot; &#125;);</div><div class="line">define(&apos;I am a template. My name is &#123;&#123;name&#125;&#125;.&apos;);</div><div class="line">define(function() &#123;</div><div class="line">      // 模块代码</div><div class="line">&#125;) ;</div><div class="line">//也可以接受依赖</div><div class="line">define(&apos;hello&apos;, [&apos;jquery&apos;], function(require, exports, module) &#123;</div><div class="line">  // 模块代码</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">//引用</div><div class="line">define(function(require, exports) &#123;</div><div class="line">  // 同步获取模块 a 的接口</div><div class="line">  const a = require(&apos;./a&apos;);  </div><div class="line">  // 调用模块 a 的方法</div><div class="line">  a.doSomething();</div><div class="line"></div><div class="line"> // 异步获取模块b的接口</div><div class="line">  require.async(&apos;./b&apos;, function(b) &#123;</div><div class="line">    b.doSomething();</div><div class="line">  &#125;);</div><div class="line">// 异步加载多个模块，在加载完成时，执行回调</div><div class="line">  require.async([&apos;./c&apos;, &apos;./d&apos;], function(c, d) &#123;</div><div class="line">    c.doSomething();</div><div class="line">    d.doSomething();</div><div class="line">  &#125;);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>####特征：</p>
+<ul>
+<li>与AMD<strong>预先加载</strong>模块不同的是，CMD提倡<strong>就近加载</strong>：在需要用到该模块的地方才调用<code>require()</code>或<code>require.async()</code>获取模块接口，尽量避免预先加载不需要的模块。</li>
+<li>对于依赖的模块，AMD 是提前执行，CMD 是延迟执行。不过 RequireJS 从 2.0 开始，也改成可以延迟执行（根据写法不同，处理方式不同。<blockquote>
+<p>对于<strong>提前执行</strong>和<strong>延迟执行</strong>的理解：AMD在最初加载模块文件时，立刻执行模块中的方法，并将返回值赋值给回调函数的参数；而CMD在调用<code>const a = require(&#39;./a.js&#39;)</code>后，解析路径后只是将a.js文件中的代码通过<code>&lt;scpript&gt;</code>插入到页面中，并给予唯一的id。只有当真正调用a时，才会去执行对应id的那段js代码。所以叫延迟执行。</p>
+</blockquote>
+</li>
+<li>同时支持同步异步两种模块加载方式。</li>
+</ul>
+<h2 id="ES6"><a href="#ES6" class="headerlink" title="ES6"></a><a href="https://segmentfault.com/a/1190000003410285" target="_blank" rel="external">ES6</a></h2><p>千呼万唤ES6终于推出了模块文件系统。新一代的标准的设计理念是兼容现有的 CommonJS 和 AMD 模块。但目前因为还没有浏览器支持这个功能，我们能够看到的只是模块到处和引用的语法。个人感觉依赖<a href="http://es6.ruanyifeng.com/#docs/destructuring" target="_blank" rel="external">ES6变量结构语法</a>，这套语法用起来会比之前所有文件系统的语法更加顺手。</p>
+<h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><p>一个 ES6 的模块是一个包含了 JS 代码的文件。ES6 里没有所谓的 module 关键字。一个模块看起来就和一个普通的脚本文件一样，除了以下两个区别：</p>
+<ul>
+<li>ES6 的模块自动开启严格模式，即使你没有写 ‘use strict’。</li>
+<li>你可以在模块中使用 import 和 export。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">//直接在希望导出的 function、class、var、let 或 const 前添加export关键字</div><div class="line">export function detectCats(canvas, options) &#123;</div><div class="line">  var kittydar = new Kittydar(options);</div><div class="line">  return kittydar.detectCats(canvas);</div><div class="line">&#125;</div><div class="line">export class Kittydar &#123;</div><div class="line">  ... several methods doing image processing ...</div><div class="line">&#125;</div><div class="line">// This helper function isn&apos;t exported.</div><div class="line">function resizeCanvas() &#123;</div><div class="line">  ...</div><div class="line">&#125;</div><div class="line"></div><div class="line">//直接导出对象集合：</div><div class="line">export &#123;detectCats, Kittydar&#125;;</div><div class="line"></div><div class="line">// no `export` keyword required here</div><div class="line">function detectCats(canvas, options) &#123; ... &#125;</div><div class="line">class Kittydar &#123; ... &#125;</div></pre></td></tr></table></figure>
+<p>在另外一个文件中，我们可以导入这个模块并且使用 detectCats() 函数：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">//引用整个模块导出对象</div><div class="line">import kitty from &quot;kittydar.js&quot;;</div><div class="line">kitty.detectCats();</div><div class="line"></div><div class="line">//直接引用模块中的某个方法或变量</div><div class="line">import &#123;detectCats&#125; from &quot;kittydar.js&quot;;</div><div class="line"></div><div class="line">function go() &#123;</div><div class="line">    var canvas = document.getElementById(&quot;catpix&quot;);</div><div class="line">    var cats = detectCats(canvas);</div><div class="line">    drawRectangles(canvas, cats);</div><div class="line">&#125;</div><div class="line"></div><div class="line">//同时引用模块中的多个方法或变量</div><div class="line">import &#123;detectCats, Kittydar&#125; from &quot;kittydar.js&quot;;</div></pre></td></tr></table></figure></p>
+<p>####特征：<br>由于在浏览器端仍没有具体的实现，很难去判断它的特性。Jon Coppeard 正在火狐浏览器上实现 ES6 的模块。之后包括 <a href="https://github.com/whatwg/loader" target="_blank" rel="external">JavaScript Loader 规范</a>在内的工作已经在进行中。HTML 中类似 <script type="module">这样的东西之后也会和大家见面。</p>
+<p>##总结：</p>
+<ul>
+<li>相同点是，所有的文件模块系统，都采用单例模式。</li>
+<li>模块加载方面：CJS采用同步阻塞机制，而AMD采用异步回调机制，CMD可通过调用不同的<code>require</code>方法，采用不同的机制。</li>
+<li>模块执行方面：CJS，AMD都采用预先执行，在引用模块的同时执行模块代码；CMD则采用延迟执行，只有当模块中的变量或方法真正被执行时， 模块代码才被执行。</li>
+<li>个人觉得服务器端使用CJS和CMD都可以，但比较偏爱CJS简洁的语法。浏览器端从性能方面考虑还是比较推荐使用AMD，尽量避免在代码运行过程中去做资源请求。</li>
+<li>特别推荐使用<a href="http://webpack.github.io/">webpack模块打包工具</a>配上ES6的模块文件系统语法，在本地进行模块编译后上线。</li>
+</ul>
+<p><strong>参考：</strong><br><a href="http://javascript.ruanyifeng.com/nodejs/module.html#toc0">CommonJS规范</a><br><a href="http://www.ruanyifeng.com/blog/2012/10/asynchronous_module_definition.html">阮一峰AMD</a><br><a href="https://www.zhihu.com/question/20351507">AMD和CMD的区别from玉伯</a><br><a href="https://segmentfault.com/q/1010000008543797/a-1020000008546208">关于AMD 是提前执行，CMD 是延迟执行</a><br><a href="https://hacks.mozilla.org/2015/08/es6-in-depth-modules/">ES6文件系统模块</a></p>
+</script></p>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/blog/tags/JavaScript/" rel="tag"># JavaScript</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2017/03/21/震惊！菜鸟竟写出这样的LazyMen/" rel="next" title="震惊！菜鸟竟写出这样的LazyMen">
+                <i class="fa fa-chevron-left"></i> 震惊！菜鸟竟写出这样的LazyMen
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2016/10/12/Html-table-实现Excel多格粘贴/" rel="prev" title="Html table 实现Excel多格粘贴">
+                Html table 实现Excel多格粘贴 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/blog/images/avatar.gif"
+               alt="Daisykoo" />
+          <p class="site-author-name" itemprop="name">Daisykoo</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/blog/archives">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">Artikel</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">Tags</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ES6"><span class="nav-number">1.</span> <span class="nav-text">ES6</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#语法"><span class="nav-number">1.0.1.</span> <span class="nav-text">语法</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Daisykoo</span>
+</div>
+
+
+<div class="powered-by">
+  Erstellt mit  <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/blog/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/blog/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/blog/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/blog/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/blog/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/blog/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
