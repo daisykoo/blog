@@ -90,18 +90,18 @@
 
 
 
-<meta name="description" content="学习ES6和Webpack过程中，研究了一下CommonJS，AMD， CMD， ES6这些模块系统到底有什么区别。 #先提结论：  相同点是，所有的文件模块系统，都采用单例模式。 模块加载方面：CJS采用同步阻塞机制，而AMD采用异步回调机制，CMD可通过调用不同的require方法，采用不同的机制。 模块执行方面：CJS，AMD都采用预先执行，在引用模块的同时执行模块代码；CMD则采用延迟执行">
+<meta name="description" content="学习ES6和Webpack过程中，研究了一下CommonJS，AMD， CMD， ES6这些模块系统到底有什么区别。">
 <meta name="keywords" content="JavaScript">
 <meta property="og:type" content="article">
 <meta property="og:title" content="谈谈JS的那些文件模块系统">
 <meta property="og:url" content="http://daisykoo.github.io/blog/2017/03/21/谈谈JS的那些文件模块系统/index.html">
 <meta property="og:site_name" content="new Me">
-<meta property="og:description" content="学习ES6和Webpack过程中，研究了一下CommonJS，AMD， CMD， ES6这些模块系统到底有什么区别。 #先提结论：  相同点是，所有的文件模块系统，都采用单例模式。 模块加载方面：CJS采用同步阻塞机制，而AMD采用异步回调机制，CMD可通过调用不同的require方法，采用不同的机制。 模块执行方面：CJS，AMD都采用预先执行，在引用模块的同时执行模块代码；CMD则采用延迟执行">
+<meta property="og:description" content="学习ES6和Webpack过程中，研究了一下CommonJS，AMD， CMD， ES6这些模块系统到底有什么区别。">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/2773737-a0886e8887b21e13.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2017-04-26T01:37:50.000Z">
+<meta property="og:updated_time" content="2017-04-28T02:09:36.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="谈谈JS的那些文件模块系统">
-<meta name="twitter:description" content="学习ES6和Webpack过程中，研究了一下CommonJS，AMD， CMD， ES6这些模块系统到底有什么区别。 #先提结论：  相同点是，所有的文件模块系统，都采用单例模式。 模块加载方面：CJS采用同步阻塞机制，而AMD采用异步回调机制，CMD可通过调用不同的require方法，采用不同的机制。 模块执行方面：CJS，AMD都采用预先执行，在引用模块的同时执行模块代码；CMD则采用延迟执行">
+<meta name="twitter:description" content="学习ES6和Webpack过程中，研究了一下CommonJS，AMD， CMD， ES6这些模块系统到底有什么区别。">
 <meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/2773737-a0886e8887b21e13.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 
 
@@ -327,6 +327,7 @@
 
       
         <p>学习ES6和Webpack过程中，研究了一下CommonJS，AMD， CMD， ES6这些模块系统到底有什么区别。</p>
+<a id="more"></a>
 <p>#先提结论：</p>
 <ul>
 <li>相同点是，所有的文件模块系统，都采用单例模式。</li>

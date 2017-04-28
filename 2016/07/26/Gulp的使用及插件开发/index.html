@@ -90,18 +90,18 @@
 
 
 
-<meta name="description" content="Grunt–I/O操作： 读取A →  A.a() → 写出A → 读取A → A.b() → 写出A; gulp–数据流：读取A → A.a() → A.b() → 写出A.  Part① 构建gulp安装12npm install --global gulp   //全局安装npm install --save-dev      //项目内安装 gulp官网 四个接口1234gulp.tas">
+<meta name="description" content="Grunt–I/O操作： 读取A →  A.a() → 写出A → 读取A → A.b() → 写出A; gulp–数据流：读取A → A.a() → A.b() → 写出A.">
 <meta name="keywords" content="Node.js">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Gulp的使用及插件开发">
 <meta property="og:url" content="http://daisykoo.github.io/blog/2016/07/26/Gulp的使用及插件开发/index.html">
 <meta property="og:site_name" content="new Me">
-<meta property="og:description" content="Grunt–I/O操作： 读取A →  A.a() → 写出A → 读取A → A.b() → 写出A; gulp–数据流：读取A → A.a() → A.b() → 写出A.  Part① 构建gulp安装12npm install --global gulp   //全局安装npm install --save-dev      //项目内安装 gulp官网 四个接口1234gulp.tas">
+<meta property="og:description" content="Grunt–I/O操作： 读取A →  A.a() → 写出A → 读取A → A.b() → 写出A; gulp–数据流：读取A → A.a() → A.b() → 写出A.">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/2773737-c6ddb74158bc868e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2017-04-26T01:41:04.000Z">
+<meta property="og:updated_time" content="2017-04-28T02:09:20.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Gulp的使用及插件开发">
-<meta name="twitter:description" content="Grunt–I/O操作： 读取A →  A.a() → 写出A → 读取A → A.b() → 写出A; gulp–数据流：读取A → A.a() → A.b() → 写出A.  Part① 构建gulp安装12npm install --global gulp   //全局安装npm install --save-dev      //项目内安装 gulp官网 四个接口1234gulp.tas">
+<meta name="twitter:description" content="Grunt–I/O操作： 读取A →  A.a() → 写出A → 读取A → A.b() → 写出A; gulp–数据流：读取A → A.a() → A.b() → 写出A.">
 <meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/2773737-c6ddb74158bc868e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 
 
@@ -330,6 +330,7 @@
 <p>Grunt–I/O操作： 读取A →  A.a() → 写出A → 读取A → A.b() → 写出A;</p>
 <p>gulp–数据流：读取A → A.a() → A.b() → 写出A.</p>
 </blockquote>
+<a id="more"></a>
 <h1 id="Part①-构建gulp"><a href="#Part①-构建gulp" class="headerlink" title="Part① 构建gulp"></a>Part① 构建gulp</h1><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">npm install --global gulp   //全局安装</div><div class="line">npm install --save-dev      //项目内安装</div></pre></td></tr></table></figure>
 <p><a href="http://www.gulpjs.com.cn/" target="_blank" rel="external">gulp官网</a></p>
 <h2 id="四个接口"><a href="#四个接口" class="headerlink" title="四个接口"></a>四个接口</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">gulp.task();    <span class="comment">//自定义任务</span></div><div class="line">gulp.src();		<span class="comment">//引入文件</span></div><div class="line">gulp.dest();	<span class="comment">//导出文件</span></div><div class="line">gulp.watch();	<span class="comment">//监听文件变化，调用任务</span></div></pre></td></tr></table></figure>
